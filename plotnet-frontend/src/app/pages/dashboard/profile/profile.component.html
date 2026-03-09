@@ -1,0 +1,218 @@
+<app-navbar />
+
+<main class="max-w-screen-xl mx-auto px-6 py-8">
+  <div class="max-w-lg">
+
+    <!-- Page Header -->
+    <div class="flex items-center justify-between mb-6">
+      <div>
+        <h1 class="text-xl font-semibold text-primary">My Profile</h1>
+        <p class="mt-0.5 text-xs text-muted">Your account information and verification status.</p>
+      </div>
+      @if (!editMode && user) {
+        <button
+          (click)="startEdit()"
+          class="h-8 px-4 text-xs font-medium border border-border rounded-sm text-body
+                 hover:border-primary hover:text-primary transition-colors">
+          Edit Profile
+        </button>
+      }
+    </div>
+
+    @if (saveSuccess) {
+      <div class="mb-4 px-3 py-2.5 bg-success-bg border border-success/20 rounded-sm">
+        <p class="text-xs text-success">{{ saveSuccess }}</p>
+      </div>
+    }
+
+    @if (user) {
+
+      <!-- Account Status Card -->
+      <div class="bg-card border border-border rounded-md p-5 mb-4">
+        <p class="text-xs font-medium text-muted uppercase tracking-wide mb-3">Account Status</p>
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-sm font-semibold text-primary">{{ user.fullName }}</p>
+            <p class="text-xs text-muted mt-0.5">{{ user.email }}</p>
+          </div>
+          @if (user.status === 'APPROVED') {
+            <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                         px-2 py-0.5 rounded-sm bg-success-bg text-success">Verified</span>
+          } @else if (user.status === 'REJECTED') {
+            <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                         px-2 py-0.5 rounded-sm bg-danger-bg text-danger">Rejected</span>
+          } @else {
+            <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                         px-2 py-0.5 rounded-sm bg-warning-bg text-warning">Pending Review</span>
+          }
+        </div>
+        @if (user.status === 'PENDING_VERIFICATION') {
+          <p class="mt-3 text-xs text-muted leading-relaxed border-t border-border pt-3">
+            Your account is awaiting administrator verification. You will be able to book plots once approved.
+          </p>
+        }
+      </div>
+
+      <!-- ── VIEW MODE ── -->
+      @if (!editMode) {
+        <div class="bg-card border border-border rounded-md p-5 mb-4">
+          <p class="text-xs font-medium text-muted uppercase tracking-wide mb-4">Account Details</p>
+          <div class="space-y-4">
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-[10px] text-muted uppercase tracking-wide mb-0.5">Full Name</p>
+                <p class="text-sm text-body">{{ user.fullName }}</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-muted uppercase tracking-wide mb-0.5">Email</p>
+                <p class="text-sm text-body">{{ user.email }}</p>
+              </div>
+            </div>
+
+            <div class="border-t border-border"></div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-[10px] text-muted uppercase tracking-wide mb-0.5">RERA Number</p>
+                <p class="text-sm text-body font-mono">{{ user.reraNumber }}</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-muted uppercase tracking-wide mb-0.5">Role</p>
+                <p class="text-sm text-body">{{ user.role }}</p>
+              </div>
+            </div>
+
+            <div class="border-t border-border"></div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-[10px] text-muted uppercase tracking-wide mb-0.5">Team Name</p>
+                <p class="text-sm text-body">{{ user.teamName }}</p>
+              </div>
+              <div>
+                <p class="text-[10px] text-muted uppercase tracking-wide mb-0.5">Leader Name</p>
+                <p class="text-sm text-body">{{ user.leaderName }}</p>
+              </div>
+            </div>
+
+            <div class="border-t border-border"></div>
+
+            <div>
+              <p class="text-[10px] text-muted uppercase tracking-wide mb-0.5">Member Since</p>
+              <p class="text-sm text-body">{{ user.createdAt | date: 'd MMMM y' }}</p>
+            </div>
+
+          </div>
+        </div>
+      }
+
+      <!-- ── EDIT MODE ── -->
+      @if (editMode) {
+        <div class="bg-card border border-border rounded-md p-5 mb-4">
+          <p class="text-xs font-medium text-muted uppercase tracking-wide mb-4">Edit Profile</p>
+
+          @if (saveError) {
+            <div class="mb-4 px-3 py-2.5 bg-danger-bg border border-danger/20 rounded-sm">
+              <p class="text-xs text-danger">{{ saveError }}</p>
+            </div>
+          }
+
+          <form [formGroup]="editForm" (ngSubmit)="saveProfile()" novalidate class="space-y-4">
+
+            <div>
+              <label class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">Full Name</label>
+              <input
+                type="text"
+                formControlName="fullName"
+                class="w-full h-9 px-3 text-sm text-body bg-card border rounded-sm
+                       placeholder-[#94A3B8] focus:outline-none focus:border-accent transition-colors"
+                [class.border-border]="!editForm.get('fullName')!.invalid || !editForm.get('fullName')!.touched"
+                [class.border-danger]="editForm.get('fullName')!.invalid && editForm.get('fullName')!.touched"
+              />
+              @if (editForm.get('fullName')!.invalid && editForm.get('fullName')!.touched) {
+                <p class="mt-1 text-xs text-danger">Full name is required.</p>
+              }
+            </div>
+
+            <!-- Non-editable: Email + RERA (read-only display) -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">
+                  Email <span class="normal-case text-[10px]">(cannot edit)</span>
+                </label>
+                <input
+                  type="text"
+                  [value]="user.email"
+                  disabled
+                  class="w-full h-9 px-3 text-sm bg-neutral-bg border border-border rounded-sm text-muted cursor-not-allowed"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">
+                  RERA No. <span class="normal-case text-[10px]">(cannot edit)</span>
+                </label>
+                <input
+                  type="text"
+                  [value]="user.reraNumber"
+                  disabled
+                  class="w-full h-9 px-3 text-sm bg-neutral-bg border border-border rounded-sm text-muted cursor-not-allowed font-mono"
+                />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">Team Name</label>
+                <input
+                  type="text"
+                  formControlName="teamName"
+                  class="w-full h-9 px-3 text-sm text-body bg-card border rounded-sm
+                         focus:outline-none focus:border-accent transition-colors"
+                  [class.border-border]="!editForm.get('teamName')!.invalid || !editForm.get('teamName')!.touched"
+                  [class.border-danger]="editForm.get('teamName')!.invalid && editForm.get('teamName')!.touched"
+                />
+                @if (editForm.get('teamName')!.invalid && editForm.get('teamName')!.touched) {
+                  <p class="mt-1 text-xs text-danger">Team name is required.</p>
+                }
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">Leader Name</label>
+                <input
+                  type="text"
+                  formControlName="leaderName"
+                  class="w-full h-9 px-3 text-sm text-body bg-card border rounded-sm
+                         focus:outline-none focus:border-accent transition-colors"
+                  [class.border-border]="!editForm.get('leaderName')!.invalid || !editForm.get('leaderName')!.touched"
+                  [class.border-danger]="editForm.get('leaderName')!.invalid && editForm.get('leaderName')!.touched"
+                />
+                @if (editForm.get('leaderName')!.invalid && editForm.get('leaderName')!.touched) {
+                  <p class="mt-1 text-xs text-danger">Leader name is required.</p>
+                }
+              </div>
+            </div>
+
+            <div class="pt-1 flex items-center gap-3">
+              <button
+                type="submit"
+                [disabled]="saving"
+                class="h-9 px-5 bg-primary text-white text-xs font-medium rounded-sm
+                       hover:bg-secondary transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+                {{ saving ? 'Saving...' : 'Save Changes' }}
+              </button>
+              <button
+                type="button"
+                (click)="cancelEdit()"
+                class="h-9 px-4 text-xs text-body border border-border rounded-sm
+                       hover:border-primary hover:text-primary transition-colors">
+                Cancel
+              </button>
+            </div>
+
+          </form>
+        </div>
+      }
+
+    }
+  </div>
+</main>

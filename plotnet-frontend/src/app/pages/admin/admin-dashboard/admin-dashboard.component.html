@@ -1,0 +1,122 @@
+<div class="flex min-h-screen bg-surface">
+  <app-sidebar />
+
+  <div class="flex-1 overflow-auto">
+
+    <!-- Top bar -->
+    <div class="h-14 bg-card border-b border-border px-6 flex items-center justify-between sticky top-0 z-30">
+      <h1 class="text-sm font-semibold text-primary">Dashboard</h1>
+      <span class="text-xs text-muted">{{ today | date: 'EEEE, d MMMM y' }}</span>
+    </div>
+
+    <main class="p-6">
+
+      <!-- Stat Cards -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+
+        <!-- Total Plots -->
+        <div class="bg-card border border-border rounded-md p-4">
+          <p class="text-[10px] font-medium text-muted uppercase tracking-wide mb-2">Total Plots</p>
+          @if (loadingStats) {
+            <div class="h-7 w-16 bg-neutral-bg rounded animate-pulse"></div>
+          } @else {
+            <p class="text-2xl font-bold text-primary">{{ stats?.totalPlots ?? '—' }}</p>
+          }
+        </div>
+
+        <!-- Available -->
+        <div class="bg-card border border-border rounded-md p-4">
+          <p class="text-[10px] font-medium text-muted uppercase tracking-wide mb-2">Available</p>
+          @if (loadingStats) {
+            <div class="h-7 w-16 bg-neutral-bg rounded animate-pulse"></div>
+          } @else {
+            <p class="text-2xl font-bold text-success">{{ stats?.availablePlots ?? '—' }}</p>
+          }
+        </div>
+
+        <!-- Total Bookings -->
+        <div class="bg-card border border-border rounded-md p-4">
+          <p class="text-[10px] font-medium text-muted uppercase tracking-wide mb-2">Total Bookings</p>
+          @if (loadingStats) {
+            <div class="h-7 w-16 bg-neutral-bg rounded animate-pulse"></div>
+          } @else {
+            <p class="text-2xl font-bold text-primary">{{ stats?.totalBookings ?? '—' }}</p>
+          }
+        </div>
+
+        <!-- Revenue -->
+        <div class="bg-card border border-border rounded-md p-4">
+          <p class="text-[10px] font-medium text-muted uppercase tracking-wide mb-2">Total Revenue</p>
+          @if (loadingStats) {
+            <div class="h-7 w-24 bg-neutral-bg rounded animate-pulse"></div>
+          } @else {
+            <p class="text-2xl font-bold text-primary">
+              {{ stats ? formatPrice(stats.totalRevenue) : '—' }}
+            </p>
+          }
+        </div>
+
+      </div>
+
+      <!-- Recent Bookings -->
+      <div class="bg-card border border-border rounded-md overflow-hidden">
+
+        <div class="px-5 py-3.5 border-b border-border flex items-center justify-between">
+          <p class="text-xs font-medium text-primary">Recent Bookings</p>
+          <a routerLink="/admin/bookings" class="text-xs text-accent hover:underline">View all</a>
+        </div>
+
+        @if (loadingBookings) {
+          <div class="animate-pulse">
+            @for (i of skeletonRows; track i) {
+              <div class="h-12 border-b border-border px-5 flex items-center gap-4">
+                <div class="h-3 bg-neutral-bg rounded w-1/4"></div>
+                <div class="h-3 bg-neutral-bg rounded w-1/5"></div>
+                <div class="h-3 bg-neutral-bg rounded w-1/6"></div>
+              </div>
+            }
+          </div>
+        } @else if (recentBookings.length === 0) {
+          <div class="py-10 text-center">
+            <p class="text-xs text-muted">No bookings yet.</p>
+          </div>
+        } @else {
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-surface">
+                <th class="text-left text-xs font-medium text-muted uppercase tracking-wide px-5 py-2.5">Plot</th>
+                <th class="text-left text-xs font-medium text-muted uppercase tracking-wide px-5 py-2.5">Amount</th>
+                <th class="text-left text-xs font-medium text-muted uppercase tracking-wide px-5 py-2.5">Date</th>
+                <th class="text-left text-xs font-medium text-muted uppercase tracking-wide px-5 py-2.5">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (booking of recentBookings; track booking.id) {
+                <tr class="border-t border-border hover:bg-surface transition-colors">
+                  <td class="px-5 py-3 text-sm font-medium text-body">{{ booking.plotTitle }}</td>
+                  <td class="px-5 py-3 text-sm text-muted">{{ formatPrice(booking.plotPrice) }}</td>
+                  <td class="px-5 py-3 text-sm text-muted">
+                    {{ booking.bookingDate | date: 'd MMM y' }}
+                  </td>
+                  <td class="px-5 py-3">
+                    @if (booking.status === 'CONFIRMED') {
+                      <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                                   px-2 py-0.5 rounded-sm bg-success-bg text-success">Confirmed</span>
+                    } @else if (booking.status === 'CANCELLED') {
+                      <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                                   px-2 py-0.5 rounded-sm bg-danger-bg text-danger">Cancelled</span>
+                    } @else {
+                      <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                                   px-2 py-0.5 rounded-sm bg-warning-bg text-warning">Pending</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+
+      </div>
+    </main>
+  </div>
+</div>

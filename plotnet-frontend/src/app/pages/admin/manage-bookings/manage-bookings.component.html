@@ -1,0 +1,125 @@
+<div class="flex min-h-screen bg-surface">
+  <app-sidebar />
+
+  <div class="flex-1 overflow-auto">
+
+    <!-- Top bar -->
+    <div class="h-14 bg-card border-b border-border px-6 flex items-center justify-between sticky top-0 z-30">
+      <h1 class="text-sm font-semibold text-primary">Bookings</h1>
+      <button
+        (click)="exportCsv()"
+        class="h-8 px-4 border border-border text-xs font-medium text-body rounded-sm
+               hover:border-primary hover:text-primary transition-colors">
+        Export CSV
+      </button>
+    </div>
+
+    <main class="p-6">
+
+      <!-- Filter Tabs -->
+      <div class="flex items-center gap-1 mb-5">
+        @for (f of filters; track f.value) {
+          <button
+            (click)="applyFilter(f.value)"
+            class="h-8 px-3 text-xs rounded-sm border transition-colors"
+            [class.bg-primary]="activeFilter === f.value"
+            [class.text-white]="activeFilter === f.value"
+            [class.border-primary]="activeFilter === f.value"
+            [class.text-muted]="activeFilter !== f.value"
+            [class.border-border]="activeFilter !== f.value">
+            {{ f.label }}
+          </button>
+        }
+      </div>
+
+      <div class="bg-card border border-border rounded-md overflow-hidden">
+
+        @if (loading) {
+          <div class="animate-pulse">
+            <div class="h-10 bg-surface border-b border-border"></div>
+            @for (i of skeletonRows; track i) {
+              <div class="h-14 border-b border-border px-5 flex items-center gap-4">
+                <div class="h-3 bg-neutral-bg rounded w-1/4"></div>
+                <div class="h-3 bg-neutral-bg rounded w-1/5"></div>
+              </div>
+            }
+          </div>
+        } @else if (filtered.length === 0) {
+          <div class="py-12 text-center">
+            <p class="text-xs text-muted">No bookings in this category.</p>
+          </div>
+        } @else {
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="bg-surface border-b border-border">
+                <th class="text-left text-xs font-medium text-muted uppercase tracking-wide px-5 py-3">Ref #</th>
+                <th class="text-left text-xs font-medium text-muted uppercase tracking-wide px-5 py-3">Applicant</th>
+                <th class="text-left text-xs font-medium text-muted uppercase tracking-wide px-5 py-3">Plot</th>
+                <th class="text-left text-xs font-medium text-muted uppercase tracking-wide px-5 py-3">Amount</th>
+                <th class="text-left text-xs font-medium text-muted uppercase tracking-wide px-5 py-3">Date</th>
+                <th class="text-left text-xs font-medium text-muted uppercase tracking-wide px-5 py-3">Status</th>
+                <th class="text-left text-xs font-medium text-muted uppercase tracking-wide px-5 py-3">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (booking of filtered; track booking.id) {
+                <tr class="border-t border-border hover:bg-surface transition-colors">
+                  <td class="px-5 py-3 text-sm font-mono text-muted">#{{ booking.id }}</td>
+                  <td class="px-5 py-3">
+                    @if (booking.userName) {
+                      <p class="text-sm font-medium text-body">{{ booking.userName }}</p>
+                      <p class="text-xs text-muted">{{ booking.userEmail }}</p>
+                    } @else {
+                      <p class="text-xs text-muted font-mono">User #{{ booking.userId }}</p>
+                    }
+                  </td>
+                  <td class="px-5 py-3">
+                    <p class="text-sm font-medium text-body">{{ booking.plotTitle }}</p>
+                    <p class="text-xs text-muted">{{ booking.plotLocation }}</p>
+                  </td>
+                  <td class="px-5 py-3 text-sm text-body">{{ formatPrice(booking.plotPrice) }}</td>
+                  <td class="px-5 py-3 text-sm text-muted">
+                    {{ booking.bookingDate | date: 'd MMM y' }}
+                  </td>
+                  <td class="px-5 py-3">
+                    @if (booking.status === 'CONFIRMED') {
+                      <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                                   px-2 py-0.5 rounded-sm bg-success-bg text-success">Confirmed</span>
+                    } @else if (booking.status === 'CANCELLED') {
+                      <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                                   px-2 py-0.5 rounded-sm bg-danger-bg text-danger">Cancelled</span>
+                    } @else {
+                      <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                                   px-2 py-0.5 rounded-sm bg-warning-bg text-warning">Pending</span>
+                    }
+                  </td>
+                  <td class="px-5 py-3">
+                    @if (booking.status === 'PENDING') {
+                      <div class="flex items-center gap-3">
+                        <button
+                          (click)="updateStatus(booking.id, 'CONFIRMED')"
+                          [disabled]="processingId === booking.id"
+                          class="text-xs text-success hover:underline disabled:opacity-50">
+                          Confirm
+                        </button>
+                        <button
+                          (click)="updateStatus(booking.id, 'CANCELLED')"
+                          [disabled]="processingId === booking.id"
+                          class="text-xs text-danger hover:underline disabled:opacity-50">
+                          Cancel
+                        </button>
+                      </div>
+                    } @else {
+                      <span class="text-xs text-muted">—</span>
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        }
+
+      </div>
+    </main>
+  </div>
+</div>

@@ -1,0 +1,148 @@
+<app-navbar />
+
+<main class="max-w-screen-xl mx-auto px-6 py-8">
+
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-1.5 mb-6 text-xs text-muted">
+    <a routerLink="/plots" class="hover:text-primary transition-colors">Plots</a>
+    <span>/</span>
+    @if (plot) {
+      <span class="text-body">{{ plot.title }}</span>
+    } @else {
+      <span>Detail</span>
+    }
+  </nav>
+
+  <!-- Loading -->
+  @if (loading) {
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 animate-pulse">
+      <div class="lg:col-span-3">
+        <div class="h-72 bg-neutral-bg rounded-md mb-4"></div>
+        <div class="h-4 bg-neutral-bg rounded w-1/2 mb-2"></div>
+        <div class="h-3 bg-neutral-bg rounded w-1/3 mb-4"></div>
+        <div class="h-24 bg-neutral-bg rounded"></div>
+      </div>
+      <div class="lg:col-span-2">
+        <div class="h-64 bg-neutral-bg rounded-md"></div>
+      </div>
+    </div>
+  }
+
+  <!-- Error -->
+  @if (!loading && error) {
+    <div class="text-center py-16">
+      <p class="text-sm text-danger">{{ error }}</p>
+      <a routerLink="/plots" class="mt-2 text-xs text-accent hover:underline block">Back to Plots</a>
+    </div>
+  }
+
+  <!-- Content -->
+  @if (!loading && plot) {
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-8">
+
+      <!-- Left: Image + Description -->
+      <div class="lg:col-span-3">
+
+        <!-- Image -->
+        <div class="h-72 bg-neutral-bg rounded-md overflow-hidden border border-border mb-5">
+          @if (plot.imageUrl) {
+            <img
+              [src]="plot.imageUrl"
+              [alt]="plot.title"
+              class="w-full h-full object-cover"
+            />
+          } @else {
+            <div class="w-full h-full flex items-center justify-center">
+              <span class="text-xs text-muted">No image available</span>
+            </div>
+          }
+        </div>
+
+        <!-- Title + Location -->
+        <h1 class="text-xl font-semibold text-primary mb-1">{{ plot.title }}</h1>
+        <p class="text-sm text-muted mb-5">{{ plot.location }}</p>
+
+        <!-- Divider -->
+        <div class="border-t border-border mb-5"></div>
+
+        <!-- Description -->
+        <h2 class="text-xs font-medium text-muted uppercase tracking-wide mb-2">About this plot</h2>
+        <p class="text-sm text-body leading-relaxed">
+          {{ plot.description || 'No description provided for this plot.' }}
+        </p>
+
+      </div>
+
+      <!-- Right: Info Card -->
+      <div class="lg:col-span-2">
+        <div class="bg-card border border-border rounded-md p-6 sticky top-20">
+
+          <!-- Price -->
+          <p class="text-xs text-muted uppercase tracking-wide mb-1">Asking Price</p>
+          <p class="text-2xl font-bold text-primary mb-4">{{ formatPrice(plot.price) }}</p>
+
+          <!-- Divider -->
+          <div class="border-t border-border mb-4"></div>
+
+          <!-- Specs Grid -->
+          <div class="grid grid-cols-2 gap-4 mb-5">
+            <div>
+              <p class="text-[10px] text-muted uppercase tracking-wide mb-0.5">Area</p>
+              <p class="text-sm font-medium text-body">{{ plot.area }} sq ft</p>
+            </div>
+            <div>
+              <p class="text-[10px] text-muted uppercase tracking-wide mb-0.5">Status</p>
+              @if (plot.status === 'AVAILABLE') {
+                <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                             px-2 py-0.5 rounded-sm bg-success-bg text-success">Available</span>
+              } @else if (plot.status === 'BOOKED') {
+                <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                             px-2 py-0.5 rounded-sm bg-danger-bg text-danger">Booked</span>
+              } @else {
+                <span class="inline-block text-[11px] font-medium uppercase tracking-wide
+                             px-2 py-0.5 rounded-sm bg-warning-bg text-warning">Reserved</span>
+              }
+            </div>
+            <div>
+              <p class="text-[10px] text-muted uppercase tracking-wide mb-0.5">Location</p>
+              <p class="text-sm font-medium text-body truncate">{{ plot.location }}</p>
+            </div>
+            <div>
+              <p class="text-[10px] text-muted uppercase tracking-wide mb-0.5">Listed on</p>
+              <p class="text-sm font-medium text-body">
+                {{ plot.createdAt | date: 'd MMM y' }}
+              </p>
+            </div>
+          </div>
+
+          <!-- Divider -->
+          <div class="border-t border-border mb-4"></div>
+
+          <!-- Book Button -->
+          @if (plot.status === 'AVAILABLE') {
+            <button
+              (click)="bookPlot()"
+              class="w-full h-9 bg-primary text-white text-sm font-medium rounded-sm
+                     hover:bg-secondary transition-colors">
+              Book This Plot
+            </button>
+            @if (!auth.isLoggedIn()) {
+              <p class="mt-2 text-xs text-muted text-center">
+                You will be asked to sign in before booking.
+              </p>
+            }
+          } @else {
+            <button
+              disabled
+              class="w-full h-9 bg-neutral-bg text-neutral-text text-sm font-medium rounded-sm cursor-not-allowed">
+              Not Available
+            </button>
+          }
+
+        </div>
+      </div>
+
+    </div>
+  }
+
+</main>

@@ -1,0 +1,98 @@
+<div class="min-h-screen bg-surface flex items-center justify-center px-4">
+
+  <div class="w-full max-w-sm">
+
+    <!-- Wordmark -->
+    <div class="mb-8 text-center">
+      <span class="text-lg font-bold tracking-tight text-primary">PlotNet</span>
+      <p class="mt-1 text-xs text-muted">Land &amp; Plot Management System</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-card border border-border rounded-md p-8">
+
+      <h1 class="text-base font-semibold text-primary mb-1">Sign in to your account</h1>
+      <p class="text-xs text-muted mb-6">Enter your credentials to continue.</p>
+
+      <!-- Server Error -->
+      @if (error) {
+        <div class="mb-4 px-3 py-2.5 bg-danger-bg border border-danger/20 rounded-sm">
+          <p class="text-xs text-danger">{{ error }}</p>
+        </div>
+      }
+
+      <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+
+        <!-- Email -->
+        <div class="mb-4">
+          <label for="email" class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">
+            Email address
+          </label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            placeholder="you@example.com"
+            class="w-full h-9 px-3 text-sm text-body bg-card border rounded-sm placeholder-[#94A3B8] transition-colors
+                   focus:outline-none focus:ring-0"
+            [class.border-border]="!email.invalid || !email.touched"
+            [class.focus:border-accent]="!email.invalid || !email.touched"
+            [class.border-danger]="email.invalid && email.touched"
+          />
+          @if (email.invalid && email.touched) {
+            <p class="mt-1 text-xs text-danger">
+              @if (email.errors?.['required']) { Email is required. }
+              @else if (email.errors?.['email']) { Enter a valid email address. }
+            </p>
+          }
+        </div>
+
+        <!-- Password -->
+        <div class="mb-6">
+          <div class="mb-1.5">
+            <label for="password" class="block text-xs font-medium text-muted uppercase tracking-wide">
+              Password
+            </label>
+            <p class="mt-0.5 text-xs text-muted">Forgot password? Contact your administrator.</p>
+          </div>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            autocomplete="current-password"
+            placeholder="Minimum 8 characters"
+            class="w-full h-9 px-3 text-sm text-body bg-card border rounded-sm placeholder-[#94A3B8] transition-colors
+                   focus:outline-none focus:ring-0"
+            [class.border-border]="!password.invalid || !password.touched"
+            [class.border-danger]="password.invalid && password.touched"
+          />
+          @if (password.invalid && password.touched) {
+            <p class="mt-1 text-xs text-danger">
+              @if (password.errors?.['required']) { Password is required. }
+              @else if (password.errors?.['minlength']) { Password must be at least 8 characters. }
+            </p>
+          }
+        </div>
+
+        <!-- Submit -->
+        <button
+          type="submit"
+          [disabled]="loading"
+          class="w-full h-9 bg-primary text-white text-sm font-medium rounded-sm
+                 hover:bg-secondary transition-colors disabled:opacity-60 disabled:cursor-not-allowed">
+          @if (loading) { Signing in... }
+          @else { Sign In }
+        </button>
+
+      </form>
+    </div>
+
+    <!-- Footer link -->
+    <p class="mt-4 text-center text-xs text-muted">
+      Don't have an account?
+      <a routerLink="/register" class="text-accent hover:underline font-medium ml-1">Register</a>
+    </p>
+
+  </div>
+</div>

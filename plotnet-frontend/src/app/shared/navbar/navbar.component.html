@@ -1,0 +1,71 @@
+<header class="h-14 bg-card border-b border-border sticky top-0 z-40">
+  <div class="max-w-screen-xl mx-auto h-full px-6 flex items-center justify-between">
+
+    <!-- Left: Wordmark -->
+    <a routerLink="/plots" class="text-sm font-bold tracking-tight text-primary no-underline">
+      PlotNet
+    </a>
+
+    <!-- Right: Nav Links -->
+    <nav class="flex items-center gap-1">
+
+      <a
+        routerLink="/plots"
+        routerLinkActive="text-primary font-medium"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="px-3 py-1.5 text-xs text-muted hover:text-primary rounded-sm transition-colors">
+        Plots
+      </a>
+
+      @if (auth.isLoggedIn()) {
+
+        @if (auth.isAdmin()) {
+          <a
+            routerLink="/admin"
+            routerLinkActive="text-primary font-medium"
+            class="px-3 py-1.5 text-xs text-muted hover:text-primary rounded-sm transition-colors">
+            Admin Panel
+          </a>
+        } @else {
+          <a
+            routerLink="/dashboard/bookings"
+            routerLinkActive="text-primary font-medium"
+            class="px-3 py-1.5 text-xs text-muted hover:text-primary rounded-sm transition-colors">
+            My Bookings
+          </a>
+          <a
+            routerLink="/dashboard/profile"
+            routerLinkActive="text-primary font-medium"
+            class="px-3 py-1.5 text-xs text-muted hover:text-primary rounded-sm transition-colors">
+            Profile
+          </a>
+        }
+
+        <!-- Divider -->
+        <span class="mx-2 w-px h-4 bg-border inline-block"></span>
+
+        <!-- User name + Sign out -->
+        <span class="text-xs text-muted mr-2">{{ user?.fullName }}</span>
+        <button
+          (click)="logout()"
+          class="px-3 py-1.5 text-xs text-body border border-border rounded-sm hover:border-primary hover:text-primary transition-colors">
+          Sign Out
+        </button>
+
+      } @else {
+
+        <a
+          routerLink="/login"
+          class="px-3 py-1.5 text-xs text-muted hover:text-primary rounded-sm transition-colors">
+          Sign In
+        </a>
+        <a
+          routerLink="/register"
+          class="px-3 py-1.5 text-xs font-medium bg-primary text-white rounded-sm hover:bg-secondary transition-colors ml-1">
+          Register
+        </a>
+
+      }
+    </nav>
+  </div>
+</header>

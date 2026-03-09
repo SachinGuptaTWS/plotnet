@@ -1,0 +1,50 @@
+# ================================
+# = DATABASE CONFIG (NeonDB)     =
+# ================================
+# Copy this file to application.properties and fill in your credentials.
+
+spring.datasource.url=jdbc:postgresql://<neon-host>/neondb?sslmode=require&channel_binding=require
+spring.datasource.username=<your-username>
+spring.datasource.password=<your-password>
+spring.datasource.driver-class-name=org.postgresql.Driver
+
+# HikariCP tuning for serverless connection pooler
+spring.datasource.hikari.connection-timeout=30000
+spring.datasource.hikari.maximum-pool-size=5
+spring.datasource.hikari.minimum-idle=1
+
+# ================================
+# = HIBERNATE / JPA              =
+# ================================
+
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.database-platform=org.hibernate.dialect.PostgreSQLDialect
+spring.jpa.show-sql=true
+spring.jpa.properties.hibernate.format_sql=true
+spring.jpa.properties.hibernate.jdbc.lob.non_contextual_creation=true
+
+# ================================
+# = JACKSON                      =
+# ================================
+
+spring.jackson.serialization.write-dates-as-timestamps=false
+
+# ================================
+# = JWT                          =
+# ================================
+
+jwt.secret=your-256-bit-secret-key-replace-this-with-something-secure
+jwt.expiration=86400000
+
+# ================================
+# = SERVER                       =
+# ================================
+
+server.port=8080
+
+# ================================
+# = LOGGING                      =
+# ================================
+
+logging.level.org.hibernate.SQL=DEBUG
+logging.level.org.hibernate.type.descriptor.sql=TRACE

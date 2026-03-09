@@ -1,0 +1,257 @@
+<app-navbar />
+
+<main class="max-w-screen-xl mx-auto px-6 py-8">
+
+  <!-- Breadcrumb -->
+  <nav class="flex items-center gap-1.5 mb-6 text-xs text-muted">
+    <a routerLink="/plots" class="hover:text-primary transition-colors">Plots</a>
+    <span>/</span>
+    <span class="text-body">Payment</span>
+  </nav>
+
+  <div class="max-w-3xl">
+    <h1 class="text-xl font-semibold text-primary mb-1">Complete Payment</h1>
+    <p class="text-xs text-muted mb-6">Review your order and enter payment details.</p>
+
+    <!-- Sandbox Notice -->
+    <div class="flex items-start gap-2.5 px-4 py-3 bg-warning-bg border border-warning/20 rounded-sm mb-6">
+      <svg class="w-4 h-4 text-warning shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path d="M12 9v2m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/>
+      </svg>
+      <p class="text-xs text-warning leading-relaxed">
+        <span class="font-medium">Sandbox Mode.</span>
+        This is a simulated payment environment. No real transaction will occur.
+        Use any valid-looking card details or UPI ID.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+      <!-- Left: Payment Form (3 cols) -->
+      <div class="lg:col-span-3">
+        <div class="bg-card border border-border rounded-md overflow-hidden">
+
+          <!-- Payment Method Tabs -->
+          <div class="flex border-b border-border">
+            <button
+              (click)="setMethod('CARD')"
+              class="flex-1 py-3 text-xs font-medium transition-colors border-b-2"
+              [class.text-primary]="method === 'CARD'"
+              [class.border-primary]="method === 'CARD'"
+              [class.text-muted]="method !== 'CARD'"
+              [class.border-transparent]="method !== 'CARD'">
+              Credit / Debit Card
+            </button>
+            <button
+              (click)="setMethod('UPI')"
+              class="flex-1 py-3 text-xs font-medium transition-colors border-b-2"
+              [class.text-primary]="method === 'UPI'"
+              [class.border-primary]="method === 'UPI'"
+              [class.text-muted]="method !== 'UPI'"
+              [class.border-transparent]="method !== 'UPI'">
+              UPI
+            </button>
+          </div>
+
+          <div class="p-5">
+
+            @if (error) {
+              <div class="mb-4 px-3 py-2.5 bg-danger-bg border border-danger/20 rounded-sm">
+                <p class="text-xs text-danger">{{ error }}</p>
+              </div>
+            }
+
+            <!-- ── CARD FORM ── -->
+            @if (method === 'CARD') {
+              <form [formGroup]="cardForm" (ngSubmit)="pay()" novalidate class="space-y-4">
+
+                <div>
+                  <label class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">
+                    Card Number
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="cardNumber"
+                    placeholder="4242 4242 4242 4242"
+                    maxlength="19"
+                    (input)="formatCardInput($event)"
+                    class="w-full h-9 px-3 text-sm text-body bg-card border rounded-sm font-mono
+                           placeholder-[#94A3B8] focus:outline-none focus:border-accent transition-colors"
+                    [class.border-border]="!cardForm.get('cardNumber')!.invalid || !cardForm.get('cardNumber')!.touched"
+                    [class.border-danger]="cardForm.get('cardNumber')!.invalid && cardForm.get('cardNumber')!.touched"
+                  />
+                  @if (cardForm.get('cardNumber')!.invalid && cardForm.get('cardNumber')!.touched) {
+                    <p class="mt-1 text-xs text-danger">Enter a valid 16-digit card number.</p>
+                  }
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                  <div>
+                    <label class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">
+                      Expiry
+                    </label>
+                    <input
+                      type="text"
+                      formControlName="expiry"
+                      placeholder="MM/YY"
+                      maxlength="5"
+                      (input)="formatExpiryInput($event)"
+                      class="w-full h-9 px-3 text-sm text-body bg-card border rounded-sm font-mono
+                             placeholder-[#94A3B8] focus:outline-none focus:border-accent transition-colors"
+                      [class.border-border]="!cardForm.get('expiry')!.invalid || !cardForm.get('expiry')!.touched"
+                      [class.border-danger]="cardForm.get('expiry')!.invalid && cardForm.get('expiry')!.touched"
+                    />
+                    @if (cardForm.get('expiry')!.invalid && cardForm.get('expiry')!.touched) {
+                      <p class="mt-1 text-xs text-danger">Enter MM/YY.</p>
+                    }
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">
+                      CVV
+                    </label>
+                    <input
+                      type="password"
+                      formControlName="cvv"
+                      placeholder="•••"
+                      maxlength="4"
+                      class="w-full h-9 px-3 text-sm text-body bg-card border rounded-sm font-mono
+                             placeholder-[#94A3B8] focus:outline-none focus:border-accent transition-colors"
+                      [class.border-border]="!cardForm.get('cvv')!.invalid || !cardForm.get('cvv')!.touched"
+                      [class.border-danger]="cardForm.get('cvv')!.invalid && cardForm.get('cvv')!.touched"
+                    />
+                    @if (cardForm.get('cvv')!.invalid && cardForm.get('cvv')!.touched) {
+                      <p class="mt-1 text-xs text-danger">Enter 3–4 digit CVV.</p>
+                    }
+                  </div>
+                </div>
+
+                <div>
+                  <label class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">
+                    Name on Card
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="nameOnCard"
+                    placeholder="As printed on card"
+                    class="w-full h-9 px-3 text-sm text-body bg-card border rounded-sm
+                           placeholder-[#94A3B8] focus:outline-none focus:border-accent transition-colors"
+                    [class.border-border]="!cardForm.get('nameOnCard')!.invalid || !cardForm.get('nameOnCard')!.touched"
+                    [class.border-danger]="cardForm.get('nameOnCard')!.invalid && cardForm.get('nameOnCard')!.touched"
+                  />
+                  @if (cardForm.get('nameOnCard')!.invalid && cardForm.get('nameOnCard')!.touched) {
+                    <p class="mt-1 text-xs text-danger">Enter name as on card.</p>
+                  }
+                </div>
+
+                <div class="pt-1">
+                  <button
+                    type="submit"
+                    [disabled]="processing"
+                    class="w-full h-10 bg-primary text-white text-sm font-medium rounded-sm
+                           hover:bg-secondary transition-colors disabled:opacity-60 disabled:cursor-not-allowed
+                           flex items-center justify-center gap-2">
+                    @if (processing) {
+                      <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                      </svg>
+                      Processing payment...
+                    } @else {
+                      Pay {{ formatPrice(plotPrice) }}
+                    }
+                  </button>
+                </div>
+
+              </form>
+            }
+
+            <!-- ── UPI FORM ── -->
+            @if (method === 'UPI') {
+              <form [formGroup]="upiForm" (ngSubmit)="pay()" novalidate class="space-y-4">
+
+                <div>
+                  <label class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">
+                    UPI ID
+                  </label>
+                  <input
+                    type="text"
+                    formControlName="upiId"
+                    placeholder="yourname@upi"
+                    class="w-full h-9 px-3 text-sm text-body bg-card border rounded-sm font-mono
+                           placeholder-[#94A3B8] focus:outline-none focus:border-accent transition-colors"
+                    [class.border-border]="!upiForm.get('upiId')!.invalid || !upiForm.get('upiId')!.touched"
+                    [class.border-danger]="upiForm.get('upiId')!.invalid && upiForm.get('upiId')!.touched"
+                  />
+                  @if (upiForm.get('upiId')!.invalid && upiForm.get('upiId')!.touched) {
+                    <p class="mt-1 text-xs text-danger">Enter a valid UPI ID (e.g. name&#64;upi).</p>
+                  }
+                  <p class="mt-1.5 text-xs text-muted">e.g. mobilenumber&#64;upi, name&#64;okaxis</p>
+                </div>
+
+                <div class="pt-1">
+                  <button
+                    type="submit"
+                    [disabled]="processing"
+                    class="w-full h-10 bg-primary text-white text-sm font-medium rounded-sm
+                           hover:bg-secondary transition-colors disabled:opacity-60 disabled:cursor-not-allowed
+                           flex items-center justify-center gap-2">
+                    @if (processing) {
+                      <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+                      </svg>
+                      Processing payment...
+                    } @else {
+                      Pay {{ formatPrice(plotPrice) }}
+                    }
+                  </button>
+                </div>
+
+              </form>
+            }
+
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Order Summary (2 cols) -->
+      <div class="lg:col-span-2">
+        <div class="bg-card border border-border rounded-md p-5 sticky top-20">
+          <p class="text-xs font-medium text-muted uppercase tracking-wide mb-4">Order Summary</p>
+
+          <p class="text-sm font-semibold text-primary mb-0.5">{{ plotTitle }}</p>
+          <p class="text-xs text-muted mb-4">Booking Reference #{{ bookingId }}</p>
+
+          <div class="border-t border-border pt-4 space-y-2">
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-muted">Plot Price</span>
+              <span class="text-xs text-body">{{ formatPrice(plotPrice) }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-muted">Processing Fee</span>
+              <span class="text-xs text-success">Free</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-xs text-muted">GST</span>
+              <span class="text-xs text-body">Included</span>
+            </div>
+          </div>
+
+          <div class="border-t border-border mt-4 pt-4 flex items-center justify-between">
+            <span class="text-xs font-medium text-primary">Total Payable</span>
+            <span class="text-base font-bold text-primary">{{ formatPrice(plotPrice) }}</span>
+          </div>
+
+          <div class="mt-5 flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-muted" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0110 0v4"/>
+            </svg>
+            <p class="text-[10px] text-muted">Secured by 256-bit SSL encryption</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</main>

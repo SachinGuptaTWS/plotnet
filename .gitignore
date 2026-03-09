@@ -1,0 +1,26 @@
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# IDEs
+.idea/
+.vscode/
+*.iml
+
+# Backend build
+com.plotnet.dto/target/
+
+# Backend secrets
+com.plotnet.dto/src/main/resources/application.properties
+
+# Frontend build output
+plotnet-frontend/dist/
+plotnet-frontend/.angular/cache/
+
+# Node modules
+plotnet-frontend/node_modules/
+
+# Logs
+*.log
