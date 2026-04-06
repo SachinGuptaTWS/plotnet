@@ -105,6 +105,18 @@
 
           </div>
         </div>
+
+        @if (user.role === 'ASSOCIATE') {
+          <div class="bg-card border border-border rounded-md p-5 mb-4">
+            <p class="text-xs font-medium text-muted uppercase tracking-wide mb-2">Community feedback</p>
+            <p class="text-xs text-muted mb-3 leading-relaxed">
+              Share suggestions or reviews to help us improve. Submissions are visible to all users on the reviews page.
+            </p>
+            <a routerLink="/dashboard/feedback" class="text-xs font-medium text-accent hover:underline">Write feedback</a>
+            <span class="text-xs text-muted mx-2">·</span>
+            <a routerLink="/reviews" class="text-xs text-muted hover:text-accent hover:underline">View all reviews</a>
+          </div>
+        }
       }
 
       <!-- ── EDIT MODE ── -->

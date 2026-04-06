@@ -1,6 +1,6 @@
 import { Component, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
 import { AuthService } from '../../../core/services/auth.service';
 
 @Component({
@@ -11,13 +11,13 @@ import { AuthService } from '../../../core/services/auth.service';
 export class RegisterComponent {
   form: FormGroup;
   loading = false;
-  error = '';
-  success = '';
+  /** Shown after successful signup (toast also fires). */
+  registerSuccess = false;
 
   constructor(
     private fb: FormBuilder,
     private auth: AuthService,
-    private router: Router,
+    private toastr: ToastrService,
     private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
@@ -44,19 +44,27 @@ export class RegisterComponent {
     }
 
     this.loading = true;
-    this.error = '';
-    this.success = '';
+    this.registerSuccess = false;
 
     this.auth.register(this.form.value).subscribe({
       next: () => {
         this.loading = false;
-        this.success = 'Account created. Awaiting administrator verification before you can sign in.';
+        this.toastr.success(
+          'Account created. Awaiting administrator verification before you can sign in.'
+        );
+        this.registerSuccess = true;
         this.form.reset();
         this.cdr.detectChanges();
       },
       error: (err) => {
         this.loading = false;
-        this.error = err?.error?.message ?? err?.error ?? 'Registration failed. Please try again.';
+        const msg =
+          typeof err?.error?.message === 'string'
+            ? err.error.message
+            : typeof err?.error === 'string'
+              ? err.error
+              : 'Registration failed. Please try again.';
+        this.toastr.error(msg);
         this.cdr.detectChanges();
       }
     });

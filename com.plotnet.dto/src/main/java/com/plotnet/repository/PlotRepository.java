@@ -12,6 +12,15 @@ public interface PlotRepository extends JpaRepository<Plot, Long> {
 
     long countByStatus(PlotStatus status);
 
+    boolean existsByTitleIgnoreCaseAndLocationIgnoreCaseAndArea(String title, String location, Integer area);
+
+    boolean existsByTitleIgnoreCaseAndLocationIgnoreCaseAndAreaAndIdNot(
+            String title, String location, Integer area, Long id);
+
+    boolean existsByReraNumberIgnoreCase(String reraNumber);
+
+    boolean existsByReraNumberIgnoreCaseAndIdNot(String reraNumber, Long id);
+
     @Query("SELECT p FROM Plot p WHERE " +
            "(:location IS NULL OR LOWER(p.location) LIKE LOWER(CONCAT('%', :location, '%'))) AND " +
            "(:minArea IS NULL OR p.area >= :minArea) AND " +

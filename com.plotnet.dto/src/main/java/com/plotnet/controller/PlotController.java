@@ -40,8 +40,12 @@ public class PlotController {
     // ── Admin CRUD ───────────────────────────────────────────────────────────
 
     @PostMapping("/api/admin/plots")
-    public ResponseEntity<Plot> create(@RequestBody Map<String, Object> body) {
-        return ResponseEntity.ok(plotService.create(body));
+    public ResponseEntity<?> create(@RequestBody Map<String, Object> body) {
+        try {
+            return ResponseEntity.ok(plotService.create(body));
+        } catch (RuntimeException e) {
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
+        }
     }
 
     @PutMapping("/api/admin/plots/{id}")
@@ -50,7 +54,10 @@ public class PlotController {
         try {
             return ResponseEntity.ok(plotService.update(id, body));
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            if ("Plot not found".equals(e.getMessage())) {
+                return ResponseEntity.notFound().build();
+            }
+            return ResponseEntity.badRequest().body(Map.of("message", e.getMessage()));
         }
     }
 

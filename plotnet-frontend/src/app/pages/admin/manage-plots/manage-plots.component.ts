@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ToastrService } from 'ngx-toastr';
 import { Plot } from '../../../models/plot.model';
 import { PlotService } from '../../../core/services/plot.service';
 
@@ -25,6 +26,7 @@ export class ManagePlotsComponent implements OnInit {
   constructor(
     private plotService: PlotService,
     private fb: FormBuilder,
+    private toastr: ToastrService,
     private cdr: ChangeDetectorRef
   ) {
     this.form = this.fb.group({
@@ -32,6 +34,7 @@ export class ManagePlotsComponent implements OnInit {
       location:    ['', Validators.required],
       area:        ['', [Validators.required, Validators.min(1)]],
       price:       ['', [Validators.required, Validators.min(1)]],
+      reraNumber:  [''],
       description: [''],
       imageUrl:    [''],
       status:      ['AVAILABLE', Validators.required],
@@ -64,6 +67,7 @@ export class ManagePlotsComponent implements OnInit {
       location:    plot.location,
       area:        plot.area,
       price:       plot.price,
+      reraNumber:  plot.reraNumber ?? '',
       description: plot.description,
       imageUrl:    plot.imageUrl ?? '',
       status:      plot.status,
@@ -91,12 +95,22 @@ export class ManagePlotsComponent implements OnInit {
     request.subscribe({
       next: () => {
         this.saving = false;
+        this.toastr.success(this.editingPlot ? 'Plot updated.' : 'Plot added.');
         this.closePanel();
         this.loadPlots();
+        this.cdr.detectChanges();
       },
       error: (err) => {
         this.saving = false;
-        this.formError = err?.error?.message ?? 'Save failed.';
+        const msg =
+          typeof err?.error?.message === 'string'
+            ? err.error.message
+            : typeof err?.error === 'string'
+              ? err.error
+              : 'Save failed.';
+        this.formError = msg;
+        this.toastr.error(msg);
+        this.cdr.detectChanges();
       }
     });
   }
@@ -111,11 +125,12 @@ export class ManagePlotsComponent implements OnInit {
   }
 
   exportCsv(): void {
-    const headers = ['Plot ID', 'Title', 'Location', 'Area (sq ft)', 'Price (INR)', 'Status', 'Listed On'];
+    const headers = ['Plot ID', 'Title', 'Location', 'RERA', 'Area (sq ft)', 'Price (INR)', 'Status', 'Listed On'];
     const rows = this.plots.map(p => [
       p.id,
       `"${p.title}"`,
       `"${p.location}"`,
+      `"${(p.reraNumber ?? '').replace(/"/g, '""')}"`,
       p.area,
       p.price,
       p.status,

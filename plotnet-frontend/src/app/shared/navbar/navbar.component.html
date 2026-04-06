@@ -17,6 +17,13 @@
         Plots
       </a>
 
+      <a
+        routerLink="/reviews"
+        routerLinkActive="text-primary font-medium"
+        class="px-3 py-1.5 text-xs text-muted hover:text-primary rounded-sm transition-colors">
+        Reviews
+      </a>
+
       @if (auth.isLoggedIn()) {
 
         @if (auth.isAdmin()) {
@@ -38,6 +45,12 @@
             routerLinkActive="text-primary font-medium"
             class="px-3 py-1.5 text-xs text-muted hover:text-primary rounded-sm transition-colors">
             Profile
+          </a>
+          <a
+            routerLink="/dashboard/feedback"
+            routerLinkActive="text-primary font-medium"
+            class="px-3 py-1.5 text-xs text-muted hover:text-primary rounded-sm transition-colors">
+            Feedback
           </a>
         }
 

@@ -15,6 +15,10 @@ const routes: Routes = [
     loadChildren: () => import('./pages/auth/register/register.module').then(m => m.RegisterModule)
   },
   {
+    path: 'reviews',
+    loadChildren: () => import('./pages/reviews/reviews-public.module').then(m => m.ReviewsPublicModule)
+  },
+  {
     path: 'plots',
     loadChildren: () => import('./pages/plots/plot-list/plot-list.module').then(m => m.PlotListModule)
   },
@@ -48,6 +52,11 @@ const routes: Routes = [
     loadChildren: () => import('./pages/dashboard/profile/profile.module').then(m => m.ProfileModule)
   },
   {
+    path: 'dashboard/feedback',
+    canActivate: [AuthGuard],
+    loadChildren: () => import('./pages/dashboard/dashboard-feedback/dashboard-feedback.module').then(m => m.DashboardFeedbackModule)
+  },
+  {
     path: 'admin',
     canActivate: [AdminGuard],
     loadChildren: () => import('./pages/admin/admin-dashboard/admin-dashboard.module').then(m => m.AdminDashboardModule)
@@ -66,6 +75,11 @@ const routes: Routes = [
     path: 'admin/users',
     canActivate: [AdminGuard],
     loadChildren: () => import('./pages/admin/manage-users/manage-users.module').then(m => m.ManageUsersModule)
+  },
+  {
+    path: 'admin/feedback',
+    canActivate: [AdminGuard],
+    loadChildren: () => import('./pages/admin/manage-feedback/manage-feedback.module').then(m => m.ManageFeedbackModule)
   },
   { path: '**', redirectTo: 'plots' }
 ];

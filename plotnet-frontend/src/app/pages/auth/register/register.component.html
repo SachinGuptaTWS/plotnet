@@ -16,23 +16,6 @@
         All accounts are reviewed by an administrator before activation.
       </p>
 
-      <!-- Server Error -->
-      @if (error) {
-        <div class="mb-4 px-3 py-2.5 bg-danger-bg border border-danger/20 rounded-sm">
-          <p class="text-xs text-danger">{{ error }}</p>
-        </div>
-      }
-
-      <!-- Success -->
-      @if (success) {
-        <div class="mb-4 px-3 py-2.5 bg-success-bg border border-success/20 rounded-sm">
-          <p class="text-xs text-success">{{ success }}</p>
-          <a routerLink="/login" class="text-xs text-accent hover:underline font-medium mt-1 block">
-            Back to Sign In
-          </a>
-        </div>
-      }
-
       <form [formGroup]="form" (ngSubmit)="submit()" novalidate>
 
         <!-- Row 1: Full Name + Email -->
@@ -177,6 +160,12 @@
         </button>
 
       </form>
+
+      @if (registerSuccess) {
+        <p class="mt-4 text-center text-xs">
+          <a routerLink="/login" class="text-accent hover:underline font-medium">Back to Sign In</a>
+        </p>
+      }
     </div>
 
     <!-- Footer link -->

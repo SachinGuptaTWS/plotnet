@@ -9,5 +9,7 @@ export interface Plot {
   status: PlotStatus;
   description: string;
   imageUrl?: string;
+  /** Listing / project RERA; optional. Must be unique across plots and user accounts. */
+  reraNumber?: string | null;
   createdAt: string;
 }

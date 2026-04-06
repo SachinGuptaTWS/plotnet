@@ -60,7 +60,12 @@
 
         <!-- Title + Location -->
         <h1 class="text-xl font-semibold text-primary mb-1">{{ plot.title }}</h1>
-        <p class="text-sm text-muted mb-5">{{ plot.location }}</p>
+        <p class="text-sm text-muted" [class.mb-5]="!plot.reraNumber" [class.mb-1]="!!plot.reraNumber">
+          {{ plot.location }}
+        </p>
+        @if (plot.reraNumber) {
+          <p class="text-xs font-mono text-body mb-5">RERA: {{ plot.reraNumber }}</p>
+        }
 
         <!-- Divider -->
         <div class="border-t border-border mb-5"></div>

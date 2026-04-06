@@ -5,6 +5,7 @@ import com.plotnet.dto.LoginResponse;
 import com.plotnet.dto.SignUpRequest;
 import com.plotnet.dto.UserDTO;
 import com.plotnet.model.User;
+import com.plotnet.repository.PlotRepository;
 import com.plotnet.repository.UserRepository;
 import com.plotnet.security.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,9 @@ public class AuthService {
     private UserRepository userRepository;
 
     @Autowired
+    private PlotRepository plotRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -27,7 +31,11 @@ public class AuthService {
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new RuntimeException("Email already exists");
         }
-        if (userRepository.existsByReraNumber(request.getReraNumber())) {
+        String reraTrimmed = request.getReraNumber().trim();
+        if (userRepository.existsByReraNumberIgnoreCase(reraTrimmed)) {
+            throw new RuntimeException("RERA number already exists");
+        }
+        if (plotRepository.existsByReraNumberIgnoreCase(reraTrimmed)) {
             throw new RuntimeException("RERA number already exists");
         }
 
@@ -35,7 +43,7 @@ public class AuthService {
         user.setFullName(request.getFullName());
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setReraNumber(request.getReraNumber());
+        user.setReraNumber(reraTrimmed);
         user.setLeaderName(request.getLeaderName());
         user.setTeamName(request.getTeamName());
 

@@ -1,0 +1,79 @@
+<div class="flex min-h-screen bg-surface">
+  <app-sidebar />
+
+  <div class="flex-1 overflow-auto">
+    <div class="h-14 bg-card border-b border-border px-6 flex items-center sticky top-0 z-30">
+      <h1 class="text-sm font-semibold text-primary">User feedback</h1>
+    </div>
+
+    <main class="p-6">
+      @if (error) {
+        <div class="mb-4 px-3 py-2.5 bg-danger-bg border border-danger/20 rounded-sm">
+          <p class="text-xs text-danger">{{ error }}</p>
+        </div>
+      }
+
+      @if (loading) {
+        <div class="space-y-4 animate-pulse">
+          @for (i of skeletonRows; track i) {
+            <div class="h-40 bg-card border border-border rounded-md"></div>
+          }
+        </div>
+      } @else if (items.length === 0) {
+        <div class="bg-card border border-border rounded-md p-10 text-center">
+          <p class="text-xs text-muted">No feedback submitted yet.</p>
+        </div>
+      } @else {
+        <div class="space-y-5 max-w-3xl">
+          @for (item of items; track item.id) {
+            <article class="bg-card border border-border rounded-md p-5">
+              <div class="flex flex-wrap gap-2 items-baseline justify-between mb-2">
+                <div>
+                  <p class="text-sm font-semibold text-primary">{{ item.authorName }}</p>
+                  <p class="text-[11px] text-muted font-mono">{{ item.authorEmail }}</p>
+                </div>
+                <time class="text-[11px] text-muted">{{ formatDate(item.createdAt) }}</time>
+              </div>
+              <p class="text-sm text-body leading-relaxed whitespace-pre-wrap mb-4">{{ item.body }}</p>
+
+              @if (item.adminReply) {
+                <div class="mb-4 px-3 py-2.5 bg-surface border border-border rounded-sm">
+                  <p class="text-[10px] font-medium text-muted uppercase tracking-wide mb-1">Current reply</p>
+                  <p class="text-xs text-body whitespace-pre-wrap">{{ item.adminReply }}</p>
+                  @if (item.adminRepliedAt) {
+                    <p class="mt-1 text-[10px] text-muted">{{ formatDate(item.adminRepliedAt) }}</p>
+                  }
+                </div>
+              }
+
+              <form
+                [formGroup]="replyForm(item.id)"
+                (ngSubmit)="submitReply(item.id)"
+                class="space-y-2"
+              >
+                <label class="block text-[10px] font-medium text-muted uppercase tracking-wide">
+                  {{ item.adminReply ? 'Update reply' : 'Admin reply' }}
+                </label>
+                <textarea
+                  formControlName="reply"
+                  rows="3"
+                  class="w-full px-3 py-2 text-xs text-body bg-card border border-border rounded-sm
+                         focus:outline-none focus:border-accent resize-y"
+                  [class.border-danger]="replyForm(item.id).get('reply')!.invalid && replyForm(item.id).get('reply')!.touched"
+                ></textarea>
+                <button
+                  type="submit"
+                  [disabled]="savingId === item.id || replyForm(item.id).invalid"
+                  class="h-8 px-4 bg-primary text-white text-xs font-medium rounded-sm
+                         hover:bg-secondary transition-colors disabled:opacity-50"
+                >
+                  {{ savingId === item.id ? 'Saving...' : (item.adminReply ? 'Update reply' : 'Post reply') }}
+                </button>
+              </form>
+            </article>
+          }
+        </div>
+      }
+    </main>
+  </div>
+</div>

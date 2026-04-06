@@ -84,6 +84,7 @@ public class SecurityConfig {
                 // Public — no token needed
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/plots", "/api/plots/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/feedback").permitAll()
                 // Admin-only
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 // Everything else requires a valid JWT

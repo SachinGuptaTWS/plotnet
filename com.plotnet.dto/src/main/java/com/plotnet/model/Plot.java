@@ -28,6 +28,10 @@ public class Plot {
 
     private String imageUrl;
 
+    /** Project / listing RERA id; optional. Used for duplicate and conflict checks. */
+    @Column(length = 64)
+    private String reraNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private PlotStatus status = PlotStatus.AVAILABLE;
@@ -48,6 +52,7 @@ public class Plot {
     public Long getPrice() { return price; }
     public String getDescription() { return description; }
     public String getImageUrl() { return imageUrl; }
+    public String getReraNumber() { return reraNumber; }
     public PlotStatus getStatus() { return status; }
     public LocalDateTime getCreatedAt() { return createdAt; }
 
@@ -60,6 +65,7 @@ public class Plot {
     public void setPrice(Long price) { this.price = price; }
     public void setDescription(String description) { this.description = description; }
     public void setImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+    public void setReraNumber(String reraNumber) { this.reraNumber = reraNumber; }
     public void setStatus(PlotStatus status) { this.status = status; }
     public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

@@ -1,0 +1,62 @@
+<app-navbar />
+
+<main class="max-w-screen-xl mx-auto px-6 py-8">
+  <div class="max-w-2xl">
+    <h1 class="text-xl font-semibold text-primary">Share feedback</h1>
+    <p class="mt-1 text-xs text-muted mb-6">
+      Help us improve PlotNet. Your review is public and visible to all users once submitted.
+      <a routerLink="/reviews" class="text-accent hover:underline font-medium ml-1">View all reviews</a>
+    </p>
+
+    @if (!canSubmit) {
+      <div class="mb-6 px-4 py-3 bg-warning-bg border border-warning/20 rounded-md">
+        <p class="text-xs text-body leading-relaxed">
+          @if (user?.role === 'ADMIN') {
+            Administrators manage feedback from the Admin panel. Use
+            <a routerLink="/admin/feedback" class="text-accent hover:underline font-medium">User feedback</a>
+            to reply to reviews.
+          } @else if (user?.status === 'PENDING_VERIFICATION') {
+            Your account must be verified by an administrator before you can post feedback.
+          } @else if (user?.status === 'REJECTED') {
+            Your account cannot submit feedback. Please contact support if you need help.
+          } @else {
+            You cannot submit feedback with this account.
+          }
+        </p>
+      </div>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="submit()" class="bg-card border border-border rounded-md p-6 space-y-4">
+      <div>
+        <label class="block text-xs font-medium text-muted uppercase tracking-wide mb-1.5">
+          Your review
+        </label>
+        <textarea
+          formControlName="body"
+          rows="8"
+          placeholder="What works well? What should we improve? (minimum 10 characters)"
+          class="w-full px-3 py-2 text-sm text-body bg-card border border-border rounded-sm
+                 focus:outline-none focus:border-accent transition-colors placeholder-[#94A3B8] resize-y min-h-[160px]"
+          [class.border-danger]="form.get('body')!.invalid && form.get('body')!.touched"
+          [disabled]="!canSubmit || submitting"
+        ></textarea>
+        @if (form.get('body')!.invalid && form.get('body')!.touched) {
+          <p class="mt-1 text-xs text-danger">
+            @if (form.get('body')!.errors?.['required']) { Please enter your feedback. }
+            @else if (form.get('body')!.errors?.['minlength']) { At least 10 characters. }
+            @else { At most 2000 characters. }
+          </p>
+        }
+        <p class="mt-1 text-[11px] text-muted">{{ form.get('body')!.value?.length || 0 }} / 2000</p>
+      </div>
+
+      <button
+        type="submit"
+        [disabled]="!canSubmit || submitting || form.invalid"
+        class="h-9 px-5 bg-primary text-white text-xs font-medium rounded-sm
+               hover:bg-secondary transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+        {{ submitting ? 'Submitting...' : 'Submit review' }}
+      </button>
+    </form>
+  </div>
+</main>
